@@ -23,25 +23,89 @@ axis limits.
 6. Display the autocorrelation and partial autocorrelation plots for the ARMA(2,2) process using
 plot_acf and plot_pacf.
 ### PROGRAM:
+```
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.arima_process import ArmaProcess
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+import statsmodels.api as sm
 
+data = sm.datasets.sunspots.load_pandas().data
+
+N=1000
+plt.rcParams['figure.figsize'] = [12, 6]
+X=data['SUNACTIVITY']
+
+plt.plot(X)
+plt.title('Original Data')
+plt.show()
+
+plt.subplot(2, 1, 1)
+plot_acf(X, lags=len(X)/4, ax=plt.gca())
+plt.title('Original Data ACF')
+plt.subplot(2, 1, 2)
+plot_pacf(X, lags=len(X)/4, ax=plt.gca())
+plt.title('Original Data PACF')
+plt.tight_layout()
+plt.show()
+
+arma11_model = ARIMA(X, order=(1, 0, 1)).fit()
+phi1_arma11 = arma11_model.params['ar.L1']
+theta1_arma11 = arma11_model.params['ma.L1']
+
+ar1 = np.array([1, -phi1_arma11])
+ma1 = np.array([1, theta1_arma11])
+ARMA_1 = ArmaProcess(ar1, ma1).generate_sample(nsample=N)
+plt.plot(ARMA_1)
+plt.title('Simulated ARMA(1,1) Process')
+plt.xlim([0, 500])
+plt.show()
+
+
+plot_acf(ARMA_1)
+plt.show()
+plot_pacf(ARMA_1)
+plt.show()
+
+arma22_model = ARIMA(X, order=(2, 0, 2)).fit()
+phi1_arma22 = arma22_model.params['ar.L1']
+phi2_arma22 = arma22_model.params['ar.L2']
+theta1_arma22 = arma22_model.params['ma.L1']
+theta2_arma22 = arma22_model.params['ma.L2']
+
+ar2 = np.array([1, -phi1_arma22, -phi2_arma22])
+ma2 = np.array([1, theta1_arma22, theta2_arma22])
+ARMA_2 = ArmaProcess(ar2, ma2).generate_sample(nsample=N*10)
+plt.plot(ARMA_2)
+plt.title('Simulated ARMA(2,2) Process')
+plt.xlim([0, 500])
+plt.show()
+
+plot_acf(ARMA_2)
+plt.show()
+plot_pacf(ARMA_2)
+plt.show()
+```
 OUTPUT:
 SIMULATED ARMA(1,1) PROCESS:
-
-
+<img width="777" height="425" alt="image" src="https://github.com/user-attachments/assets/47014d04-7777-4d2e-8926-28fee2584c63" />
 
 Partial Autocorrelation
+<img width="785" height="412" alt="image" src="https://github.com/user-attachments/assets/b52690af-f6d0-49f1-8a57-88d132089c28" />
 
 Autocorrelation
-
-
+<img width="779" height="406" alt="image" src="https://github.com/user-attachments/assets/71b5ec1a-647b-413f-98f3-e84b04b09c81" />
 
 SIMULATED ARMA(2,2) PROCESS:
+<img width="790" height="415" alt="image" src="https://github.com/user-attachments/assets/327608e2-2499-4aca-a394-6e5e22854d72" />
 
 Partial Autocorrelation
-
-
+<img width="781" height="410" alt="image" src="https://github.com/user-attachments/assets/5886337e-045d-4d06-aad8-8022340c8b7d" />
 
 Autocorrelation
+<img width="771" height="407" alt="image" src="https://github.com/user-attachments/assets/59db7ae7-c029-4f97-93a5-edf47d6dff67" />
 
 RESULT:
 Thus, a python program is created to fir ARMA Model successfully.
